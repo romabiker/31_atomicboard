@@ -46,13 +46,8 @@ class BoardTests(unittest.TestCase):
         cls.driver.set_window_size(1024, 768)
         cls.driver.implicitly_wait(30)
         cls.driver.get('http://atomicboard.devman.org/create_test_user/')
-        try:
-            button_create_user = cls.driver.find_element_by_tag_name('button')
-            button_create_user.click()
-        except NoSuchElementException:
-            cls.tearDown()
-            logging.error('Could not create new user')
-            sys.exit(0)
+        button_create_user = cls.driver.find_element_by_tag_name('button')
+        button_create_user.click()
         cls.driver.get('http://atomicboard.devman.org/')
 
     def test_site_is_displayed(self):
@@ -118,9 +113,9 @@ class BoardTests(unittest.TestCase):
         input_ticket_description.submit()
         self.assertEqual(self._new_ticket_description, ticket_description.text)
 
-    def test_ticket_select_category(self,
-            cat_exp_options=["проектирование", "производство"]):
+    def test_ticket_select_category(self):
         driver = self.driver
+        cat_exp_options=["проектирование", "производство"]
         cat_act_options = []
         select_ticket_cat_activator = \
             driver.find_element_by_css_selector(

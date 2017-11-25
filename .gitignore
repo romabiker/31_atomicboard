@@ -1,0 +1,9 @@
+__pycache__/
+pip*
+env
+tester.py
+Pipfile.lock
+*.html
+api
+*.png
+*.log

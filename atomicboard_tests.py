@@ -151,6 +151,7 @@ class BoardTests(unittest.TestCase):
             second_ticket_col.find_elements_by_css_selector(self._ticket_locator))
         with open(drag_and_drop_helper_js_file) as file_handler:
             drag_and_drop_js = file_handler.read()
+        # https://stackoverflow.com/a/29381532/5992385 link to drag_and_drop_js description
         drag_and_drop_js_func_to_call = \
             '$("{what}").simulateDragDrop({{ dropTarget: "{target}"}});'.format(
                 what=self._selected_ticket_from_first_col_locator,

@@ -1,12 +1,12 @@
 import unittest
 import sys
-import time
 
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support import expected_conditions
 
 
 class BoardTests(unittest.TestCase):
@@ -16,8 +16,6 @@ class BoardTests(unittest.TestCase):
     _page_title = 'AtomicBoard'
     _logout_locator = 'a[href="/logout/"]'
     _ticket_locator = 'div.js-ticket'
-    _just_created_ticket_id_locator = \
-    '.ticket__selected > div.panel-heading-no-padding > span.ticket_id'
     _add_ticket_block_locator = 'span.add-ticket-block_button'
     _input_ticket_title_locator = 'input.editable-has-buttons'
     _ticket_status_badge_locator = 'span.badge.ticket_status'
@@ -61,7 +59,7 @@ class BoardTests(unittest.TestCase):
         self.assertTrue(self.is_element_present(
             By.CSS_SELECTOR, self._ticket_locator))
 
-    def test_ticket_create(self, added_tickets=1, time_out=5):
+    def test_ticket_create(self, added_tickets=1, time_out=10):
         driver = self.driver
         start_tickets_quantity = len(
             driver.find_elements_by_css_selector(self._ticket_locator))
@@ -71,25 +69,29 @@ class BoardTests(unittest.TestCase):
         input_ticket_block = driver.switch_to.active_element
         input_ticket_block.send_keys(self._new_ticket_title)
         input_ticket_block.submit()
-        time.sleep(time_out)
-        fin_tickets_quantity = len(
-            driver.find_elements_by_css_selector(self._ticket_locator))
-        self.assertEqual(fin_tickets_quantity,
-            start_tickets_quantity + added_tickets)
+        expected_tickets_quant = start_tickets_quantity + added_tickets
+        self.assertTrue(
+            WebDriverWait(driver, time_out).until(
+                lambda drv: len(
+                    drv.find_elements_by_css_selector(self._ticket_locator)) == \
+                    expected_tickets_quant)
+        )
 
-    def test_ticket_close(self, time_out=5):
-        ticket_status_badge = self.driver.find_element_by_css_selector(
+    def test_ticket_close(self, time_out=10):
+        driver = self.driver
+        ticket_status_badge = driver.find_element_by_css_selector(
                                           self._ticket_status_badge_locator)
         ticket_status_badge.click()
-        time.sleep(time_out)
-        close_ticket_button = self.driver.find_element_by_css_selector(
-                                          self._close_ticket_button_locator)
+        close_ticket_button = WebDriverWait(driver, time_out).until(
+            expected_conditions.visibility_of_element_located((
+                By.CSS_SELECTOR,
+                self._close_ticket_button_locator,))
+        )
         close_ticket_button.click()
-        time.sleep(time_out)
         self.assertTrue(
             self.is_element_present(
                 By.CSS_SELECTOR, self._ticket_title_closed_locator)
-            )
+        )
 
     def test_ticket_title_redaction(self):
         driver = self.driver

@@ -1,3 +1,4 @@
+// https://stackoverflow.com/a/29381532/5992385
 (function( $ ) {
         $.fn.simulateDragDrop = function(options) {
                 return this.each(function() {
